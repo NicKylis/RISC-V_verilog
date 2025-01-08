@@ -36,3 +36,6 @@ module alu
     end
 
 endmodule
+
+//iverilog -o out module.v module_tb.v (for the tb)
+//gtwave alu_tb.vcd

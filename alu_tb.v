@@ -22,6 +22,10 @@ module alu_tb;
 
     // Test procedure
     initial begin
+
+        $dumpfile("alu_tb.vcd");  // Specify the VCD output file
+        $dumpvars(0, alu_tb);     // Dump all variables for the `alu_tb` module
+        
         // Monitor outputs
         $monitor("Time: %0t | op1: %h | op2: %h | alu_op: %b | result: %h | zero: %b",
                  $time, op1, op2, alu_op, result, zero);
