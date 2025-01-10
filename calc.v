@@ -1,4 +1,5 @@
 `include "alu.v"
+`include "calc_enc.v"
 
 module calc (
     input clk,                 // Clock
@@ -12,7 +13,8 @@ module calc (
     wire [31:0] sign_ext_sw;   // Sign-extended switch input
     wire [31:0] alu_result;    // ALU result
     reg [15:0] accumulator;    // Accumulator (16-bit register)
-    reg [3:0] alu_op;          // ALU operation control signal
+    wire [3:0] alu_op;          // ALU operation control signal
+    wire [3:0] encout;         // Encoder output
 
     // Sign-Extend Module
     assign sign_ext_sw = {{16{sw[15]}}, sw}; // Sign-extend 16-bit to 32-bit
@@ -26,6 +28,16 @@ module calc (
         .zero()                    // Zero flag (not used here)
     );
 
+    // Encoder Instance
+    calc_enc my_enc (
+        .btnc(btnc),
+        .btnl(btnl),
+        .btnr(btnr),
+        .btnu(btnu),
+        .btnd(btnd),
+        .encout(encout)
+    );
+
     // Accumulator Logic
     always @(posedge clk) begin
         if (btnu) begin
@@ -36,20 +48,7 @@ module calc (
     end
 
     // ALU Operation Control Logic
-    always @(*) begin
-        //alu_op = 4'b0000; // Default operation (AND)
-        case ({btnl, btnc, btnr})
-            3'b000: alu_op = 4'b0000; // AND
-            3'b001: alu_op = 4'b0001; // OR
-            3'b010: alu_op = 4'b0010; // ADD
-            3'b011: alu_op = 4'b0110; // SUB
-            3'b111: alu_op = 4'b0101; // XOR
-            3'b101: alu_op = 4'b1001; // Logical Shift Left
-            3'b110: alu_op = 4'b1010; // Shift Right Arithmetic
-            3'b100: alu_op = 4'b0100; // Less Than
-            default: alu_op = 4'b0000; // Default (AND)
-        endcase
-    end
+    assign alu_op = encout;
 
     // Connect accumulator value to LEDs
     always @(posedge clk) begin
@@ -59,7 +58,18 @@ module calc (
 
 endmodule
 
-            // ALU_SRA:  begin 
-            //     result[15:0] = $signed(op1) >>> op2[4:0];
-            //     result[15] = (op1[15] == 1) ? 1 : 0; 
-            // end // Shift Right Arithmetic
+// // ALU Operation Control Logic
+//     always @(*) begin
+//         //alu_op = 4'b0000; // Default operation (AND)
+//         case ({btnl, btnc, btnr})
+//             3'b000: alu_op = 4'b0000; // AND
+//             3'b001: alu_op = 4'b0001; // OR
+//             3'b010: alu_op = 4'b0010; // ADD
+//             3'b011: alu_op = 4'b0110; // SUB
+//             3'b111: alu_op = 4'b0101; // XOR
+//             3'b101: alu_op = 4'b1001; // Logical Shift Left
+//             3'b110: alu_op = 4'b1010; // Shift Right Arithmetic
+//             3'b100: alu_op = 4'b0100; // Less Than
+//             default: alu_op = 4'b0000; // Default (AND)
+//         endcase
+//     end

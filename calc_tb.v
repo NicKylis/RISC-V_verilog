@@ -24,11 +24,6 @@ module calc_tb;
     );
 
     // Clock generation
-    // initial begin
-    //     clk = 0;
-    //     forever #5 clk = ~clk; // 10ns clock period
-    // end
-
     always begin
         #5; clk = ~clk;
     end
@@ -42,6 +37,7 @@ module calc_tb;
     end
     endtask
 
+    // Works on the posedge, led output is 1 cycle behind
     task ASSIGN(input btncI, input btnlI, input btnrI, input btndI, input[15:0] swI);
     begin
         btnc = btncI;
