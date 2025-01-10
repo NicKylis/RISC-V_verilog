@@ -1,4 +1,4 @@
-module regfile (
+module regfile #(parameter DATAWIDTH = 32, REGCOUNT = 32) ( //Defaults to 32-bit data width and 32 registers
     clk,        // Inputs based on instructions
     readReg1,
     readReg2,
@@ -8,9 +8,6 @@ module regfile (
     readData1,
     readData2
 );
-    // Parameters
-    parameter DATAWIDTH = 32;  // Data width (default 32 bits)
-    parameter REGCOUNT = 32;   // Number of registers (default 32)
 
     // Port declarations
     input clk;
