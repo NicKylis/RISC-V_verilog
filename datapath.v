@@ -60,8 +60,16 @@ regfile #(.DATAWIDTH(32), .REGCOUNT(32)) regfile (
 );
 
 // Immediate generation
+wire [31:0] imm_I;
+wire [31:0] imm_S;
+wire [31:0] imm_B;
+
+assign imm_I = {{20{instr[31]}}, instr[31:20]};
+assign imm_S = {{20{instr[31]}}, instr[31:25], instr[11:7]};
+assign imm_B = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0};
 
 // ALU
+
 
 // Branch target
 
