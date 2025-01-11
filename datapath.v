@@ -43,10 +43,12 @@ end
 wire [4:0] readReg1;
 wire [4:0] readReg2;
 wire [4:0] writeReg;
+wire [31:0] readData1;
+wire [31:0] readData2;
 
-assign readReg1 = instr[25:21];
-assign readReg2 = instr[20:16];
-assign writeReg = instr[15:11];
+assign readReg1 = instr[19:15];
+assign readReg2 = instr[24:20];
+assign writeReg = instr[11:7];
 
 regfile #(.DATAWIDTH(32), .REGCOUNT(32)) regfile (
     .clk(clk),
@@ -55,8 +57,8 @@ regfile #(.DATAWIDTH(32), .REGCOUNT(32)) regfile (
     .writeReg(writeReg),
     .writeData(dWriteData),
     .write(RegWrite),
-    .readData1(),
-    .readData2()
+    .readData1(readData1),
+    .readData2(readData2)
 );
 
 // Immediate generation
@@ -69,7 +71,13 @@ assign imm_S = {{20{instr[31]}}, instr[31:25], instr[11:7]};
 assign imm_B = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0};
 
 // ALU
-
+alu datapath_alu (
+    .op1(readData1),
+    .op2(ALUSrc ? imm_I : readData2),
+    .alu_op(ALUCtrl),
+    .result(dWriteData),
+    .zero(Zero)
+);
 
 // Branch target
 
