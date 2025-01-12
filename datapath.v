@@ -15,7 +15,7 @@ module datapath #(parameter INITIAL_PC = 32'h00400000) (
     output Zero,
     output [31:0] dAddress,
     output [31:0] dWriteData,
-    output [31:0] dReadData,
+    input [31:0] dReadData,
     output [31:0] WriteBackData
 );
 
