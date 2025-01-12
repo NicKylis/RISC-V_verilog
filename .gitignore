@@ -2,3 +2,4 @@ tb
 alu_tb.vcd
 calv_tb.v
 calc_tb.vcd
+tb2

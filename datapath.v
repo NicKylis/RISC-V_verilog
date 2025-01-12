@@ -19,26 +19,13 @@ module datapath #(parameter INITIAL_PC = 32'h00400000) (
     output [31:0] WriteBackData
 );
 
-// Program Counter
+// Program Counter and Branch Target
 
 // Branch instruction
 wire [31:0] branch_offset;
 assign branch_offset = {{14{instr[15]}}, instr[15:0]} << 2;
 
-// Next instruciton
-wire [31:0] next_PC;
-assign next_PC = PCSrc ? (PC + branch_offset) : (PC + 4);
-
-always @(posedge clk) begin
-    if (rst) begin
-        PC <= INITIAL_PC;
-    end else begin
-        PC <= next_PC;
-    end
-end
-
 // Register File
-
 // Decoded register addresses
 wire [4:0] readReg1;
 wire [4:0] readReg2;
@@ -49,6 +36,9 @@ wire [31:0] readData2;
 assign readReg1 = instr[19:15];
 assign readReg2 = instr[24:20];
 assign writeReg = instr[11:7];
+
+// Write back
+assign WriteBackData = MemToReg ? dReadData : dWriteData;
 
 regfile #(.DATAWIDTH(32), .REGCOUNT(32)) regfile (
     .clk(clk),
@@ -79,8 +69,16 @@ alu datapath_alu (
     .zero(Zero)
 );
 
-// Branch target
+// Next instruciton
+wire [31:0] next_PC;
+assign next_PC = PCSrc ? (PC + branch_offset) : (PC + 4);
 
-// Write back
+always @(posedge clk) begin
+    if (rst) begin
+        PC <= INITIAL_PC;
+    end else begin
+        PC <= next_PC;
+    end
+end
 
 endmodule
