@@ -13,18 +13,28 @@ module top_proc #(parameter INITIAL_PC = 32'h00400000) (
     output [31:0] WriteBackData
 );
 
+// Datapath initialization
+reg loadPC;
+reg Zero;
+reg MemToReg;
+
 datapath #(.INITIAL_PC(INITIAL_PC)) datapath (
     .instr(instr),
     .dReadData(dReadData),
     .PC(PC),
     .dAddress(dAddress),
-    .dWriteData(dWriteData)
+    .dWriteData(dWriteData),
+    .loadPC(loadPC),
+    .MemToReg(MemToReg)
 );
 
+// FSM initialization
 wire [2:0] fsm_state;
 assign fsm_state = 3'b000;
 
 always @(posedge clk) begin
+    loadPC = 0;
+    MemToReg = 0;
     case(fsm_state)
         3'b000: begin
             // IF
@@ -61,7 +71,8 @@ always @(posedge clk) begin
         end
         3'b100: begin
             // WB
-            // dAddress = 0
+            loadPC = 1;
+            // PCSrc = ;
             // MemRead = 0
             // MemWrite = 0
             // WriteBackData = 0
