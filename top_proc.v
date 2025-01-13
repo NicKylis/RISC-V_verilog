@@ -17,6 +17,8 @@ module top_proc #(parameter INITIAL_PC = 32'h00400000) (
 reg loadPC;
 reg Zero;
 reg MemToReg;
+reg [3:0] ALUCtrlModule;
+reg [3:0] ALUCtrl;
 
 datapath #(.INITIAL_PC(INITIAL_PC)) datapath (
     .instr(instr),
@@ -25,21 +27,23 @@ datapath #(.INITIAL_PC(INITIAL_PC)) datapath (
     .dAddress(dAddress),
     .dWriteData(dWriteData),
     .loadPC(loadPC),
-    .MemToReg(MemToReg)
+    .MemToReg(MemToReg),
+    .ALUCtrl(ALUCtrl)
 );
 
 // FSM initialization
 wire [2:0] fsm_state;
 assign fsm_state = 3'b000;
 
+
+
+
 always @(posedge clk) begin
-    loadPC = 0;
-    MemToReg = 0;
+    // loadPC = 0;
     case(fsm_state)
         3'b000: begin
             // IF
             // PC = PC + 4
-            // dAddress = PC
             // MemRead = 1
             // MemWrite = 0
             // WriteBackData = 0
@@ -71,7 +75,7 @@ always @(posedge clk) begin
         end
         3'b100: begin
             // WB
-            loadPC = 1;
+            // loadPC <= 1;
             // PCSrc = ;
             // MemRead = 0
             // MemWrite = 0

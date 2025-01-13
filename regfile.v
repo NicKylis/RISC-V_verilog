@@ -1,23 +1,25 @@
 module regfile #(parameter DATAWIDTH = 32, REGCOUNT = 32) ( //Defaults to 32-bit data width and 32 registers
-    clk,        // Inputs based on instructions
-    readReg1,
-    readReg2,
-    writeReg,
-    writeData,
-    write,
-    readData1,
-    readData2
+    input clk,        // Inputs based on instructions
+    input [4:0] readReg1,
+    input [4:0] readReg2,
+    input [4:0] writeReg,
+    input [DATAWIDTH-1:0] writeData,
+    input write,
+    output reg [DATAWIDTH-1:0] readData1,
+    output reg [DATAWIDTH-1:0] readData2
 );
 
     // Port declarations
-    input clk;
-    input [4:0] readReg1;               // 5-bit address for read port
-    input [4:0] readReg2;
-    input [4:0] writeReg;               // 5-bit address for write port
-    input [DATAWIDTH-1:0] writeData;    // Data to write
-    input write;                        // Write enable signal
-    output reg [DATAWIDTH-1:0] readData1; // Data from port
-    output reg [DATAWIDTH-1:0] readData2;
+    // input reg clk;
+    // input [4:0] readReg1;               
+    // input [4:0] readReg2;
+    // input [4:0] writeReg;    
+    // input [DATAWIDTH-1:0] writeData;
+    // input write;                        
+    // output reg [DATAWIDTH-1:0] readData1;
+    // output reg [DATAWIDTH-1:0] readData2;
+
+
 
     // Register file definition
     reg [DATAWIDTH-1:0] registers [0:REGCOUNT-1];
