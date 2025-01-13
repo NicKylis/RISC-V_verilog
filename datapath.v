@@ -1,5 +1,7 @@
 `include "alu.v"
 `include "regfile.v"
+`include "ram.v"
+`include "rom.v"
 
 module datapath #(parameter INITIAL_PC = 32'h00400000) (
     input clk,
