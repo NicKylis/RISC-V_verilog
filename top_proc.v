@@ -23,8 +23,10 @@ reg RegWrite;
 reg PCSrc;
 
 // FSM initialization
-wire [2:0] fsm_state;
-assign fsm_state = 3'b000;
+reg [2:0] fsm_state;
+initial begin
+    fsm_state = 3'b000;
+end
 
 // ALUCtrl unit
 always @(*) begin
@@ -64,6 +66,9 @@ end
 always @(posedge clk) begin
     // loadPC = 0;
     ALUSrc = (instr[6:0] == 7'b0000011 || instr[6:0] == 7'b0010011) ? 1 : 0;
+    MemRead = 0;
+    MemWrite = 0;
+    fsm_state = (rst) ? 3'b000 : fsm_state;
     case(fsm_state)
         3'b000: begin
             // IF
@@ -99,8 +104,6 @@ always @(posedge clk) begin
                 MemRead = 0;
                 MemWrite = 1;
             end
-            // MemRead = 0
-            // MemWrite = 0
             // WriteBackData = 0
             // Next state: 3'b100
         end
@@ -115,6 +118,7 @@ always @(posedge clk) begin
             // Next state: 3'b000
         end
     endcase
+    fsm_state = fsm_state + 1;
 end
 
 datapath #(.INITIAL_PC(INITIAL_PC)) datapath (
