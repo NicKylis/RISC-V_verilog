@@ -8,8 +8,8 @@ module top_proc #(parameter INITIAL_PC = 32'h00400000) (
     output [31:0] PC,
     output [31:0] dAddress,
     output [31:0] dWriteData,
-    output MemRead,
-    output MemWrite,
+    output reg MemRead,
+    output reg MemWrite,
     output [31:0] WriteBackData
 );
 
@@ -17,7 +17,7 @@ module top_proc #(parameter INITIAL_PC = 32'h00400000) (
 reg loadPC;
 reg Zero;
 reg MemToReg;
-reg [3:0] ALUSrc;
+reg ALUSrc;
 reg [3:0] ALUCtrl;
 reg RegWrite;
 reg PCSrc;
@@ -29,12 +29,15 @@ assign fsm_state = 3'b000;
 // ALUCtrl unit
 always @(*) begin
         case (instr[6:0])
+            // Memory instructions
             7'b0000011, // LW
             7'b0100011: // SW
                 ALUCtrl = 4'b0010; // Addition for address calculation
-            7'b1100011: // BEQ
+            // Branch instruction
+            7'b1100011:
                 ALUCtrl = 4'b0110; // Subtraction for comparison
-            7'b0110011: // R instructions
+            // R instructions
+            7'b0110011:
                 case (instr[14:12])
                     3'b000: // ADD/SUB
                         ALUCtrl = (instr[31:25] == 7'b0100000) ? 4'b0110 : 4'b0010; // SUB if funct7=0100000, else ADD
@@ -53,7 +56,6 @@ always @(*) begin
                     default:
                         ALUCtrl = 4'b1111; // Default error code
                 endcase
-
             default: // Undefined opcode
                 ALUCtrl = 4'b1111; // Default error code
         endcase
@@ -61,11 +63,12 @@ end
 
 always @(posedge clk) begin
     // loadPC = 0;
+    ALUSrc = (instr[6:0] == 7'b0000011 || instr[6:0] == 7'b0010011) ? 1 : 0;
     case(fsm_state)
         3'b000: begin
             // IF
             RegWrite = 0;
-            PCSrc = (ALUCtrl == 4'b0000 || Zero) ? 1 : 0; // Todo: add the correct ALUCtrl value
+            PCSrc = (ALUCtrl == 4'b0110 && Zero) ? 1 : 0;
             // MemRead = 1
             // MemWrite = 0
             // WriteBackData = 0
@@ -89,7 +92,13 @@ always @(posedge clk) begin
         end
         3'b011: begin
             // MEM
-            // dAddress = 0
+            if(instr[6:0] == 7'b0000011) begin
+                MemRead = 1;
+                MemWrite = 0;
+            end else if(instr[6:0] == 7'b0100011) begin
+                MemRead = 0;
+                MemWrite = 1;
+            end
             // MemRead = 0
             // MemWrite = 0
             // WriteBackData = 0
