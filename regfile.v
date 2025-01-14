@@ -1,5 +1,5 @@
 module regfile #(parameter DATAWIDTH = 32, REGCOUNT = 32) ( //Defaults to 32-bit data width and 32 registers
-    input clk,        // Inputs based on instructions
+    input clk,
     input [4:0] readReg1,
     input [4:0] readReg2,
     input [4:0] writeReg,

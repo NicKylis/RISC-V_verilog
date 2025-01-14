@@ -86,14 +86,14 @@ alu datapath_alu (
 );
 
 // Next instruciton
-wire [31:0] next_PC;
-assign next_PC = PCSrc ? (PC + branch_offset) : (PC + 4);
+// wire [31:0] next_PC;
+// assign next_PC = PCSrc ? (PC + branch_offset) : (PC + 4);
 
 always @(posedge clk) begin
     if (rst) begin
         PC <= INITIAL_PC;
     end else begin
-        PC <= next_PC;
+        PC <= PCSrc ? (PC + branch_offset) : (PC + 4);
     end
 end
 

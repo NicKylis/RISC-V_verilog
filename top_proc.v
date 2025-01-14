@@ -72,7 +72,6 @@ always @(posedge clk) begin
     case(fsm_state)
         3'b000: begin
             // IF
-            RegWrite = 0;
             PCSrc = (ALUCtrl == 4'b0110 && Zero) ? 1 : 0;
             // MemRead = 1
             // MemWrite = 0
@@ -98,11 +97,13 @@ always @(posedge clk) begin
         3'b011: begin
             // MEM
             if(instr[6:0] == 7'b0000011) begin
-                MemRead = 1;
-                MemWrite = 0;
+                MemRead <= 1;
+                MemWrite <= 0;
+                MemToReg <= 1;
             end else if(instr[6:0] == 7'b0100011) begin
-                MemRead = 0;
-                MemWrite = 1;
+                MemRead <= 0;
+                MemWrite <= 1;
+                MemToReg <= 0;
             end
             // WriteBackData = 0
             // Next state: 3'b100
@@ -118,10 +119,13 @@ always @(posedge clk) begin
             // Next state: 3'b000
         end
     endcase
-    fsm_state = fsm_state + 1;
+    fsm_state <= (loadPC) ? 3'b000 : (fsm_state + 1);
+    RegWrite <= 0;
 end
 
 datapath #(.INITIAL_PC(INITIAL_PC)) datapath (
+    .clk(clk),
+    .rst(rst),
     .instr(instr),
     .dReadData(dReadData),
     .PC(PC),
@@ -130,6 +134,7 @@ datapath #(.INITIAL_PC(INITIAL_PC)) datapath (
     .loadPC(loadPC),
     .MemToReg(MemToReg),
     .ALUCtrl(ALUCtrl),
+    .ALUSrc(ALUSrc),
     .RegWrite(RegWrite),
     .PCSrc(PCSrc)
 );
