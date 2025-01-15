@@ -42,7 +42,7 @@ module top_proc_tb;
     begin
         @(posedge clk);
         rst = 1;
-        @(posedge clk); // Use smaller delay for input change
+        @(posedge clk);
         rst = 0;
     end
     endtask
@@ -70,5 +70,13 @@ module top_proc_tb;
         // Wait for 100ns before starting the test
         #100;
        
+        // Test Case 1: Reset accumulator
+        ASSIGN(1, 32'h00000000, 32'h00000000);
+
+        // Test Case 2: ADDI
+        ASSIGN(0, 32'h00000000, 32'h00000000);
+
+        // Test Case 3: LW
+        ASSIGN(0, 32'h00000000, 32'h00000000);
     end
 endmodule

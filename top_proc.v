@@ -74,7 +74,7 @@ INSTRUCTION_MEMORY instr_mem (
 DATA_MEMORY data_mem(
     .clk(clk),
     .we(MemWrite),
-    .addr(dAddress[8:0]),
+    .addr(PC[8:0]),
     .din(dWriteData),
     .dout(WriteBackData)
 );
