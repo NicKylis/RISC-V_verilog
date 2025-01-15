@@ -1,4 +1,6 @@
 `include "datapath.v"
+`include "rom.v"
+`include "ram.v"
 
 module top_proc #(parameter INITIAL_PC = 32'h00400000) (
     input clk,
@@ -63,6 +65,12 @@ always @(*) begin
         endcase
 end
 
+INSTRUCTION_MEMORY instr_mem (
+    .clk(clk),
+    .addr(PC),
+    .dout(instr)
+);
+
 always @(posedge clk) begin
     // loadPC = 0;
     ALUSrc = (instr[6:0] == 7'b0000011 || instr[6:0] == 7'b0010011) ? 1 : 0;
@@ -97,13 +105,13 @@ always @(posedge clk) begin
         3'b011: begin
             // MEM
             if(instr[6:0] == 7'b0000011) begin
-                MemRead <= 1;
-                MemWrite <= 0;
-                MemToReg <= 1;
+                MemRead = 1;
+                MemWrite = 0;
+                MemToReg = 1;
             end else if(instr[6:0] == 7'b0100011) begin
-                MemRead <= 0;
-                MemWrite <= 1;
-                MemToReg <= 0;
+                MemRead = 0;
+                MemWrite = 1;
+                MemToReg = 0;
             end
             // WriteBackData = 0
             // Next state: 3'b100

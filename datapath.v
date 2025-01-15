@@ -1,7 +1,7 @@
 `include "alu.v"
 `include "regfile.v"
-`include "ram.v"
-`include "rom.v"
+// `include "ram.v"
+// `include "rom.v"
 
 module datapath #(parameter INITIAL_PC = 32'h00400000) (
     input clk,
@@ -37,7 +37,8 @@ wire [31:0] readData2;
 
 assign readReg1 = instr[19:15];
 assign readReg2 = instr[24:20];
-assign writeReg = instr[11:7];
+
+assign writeReg = RegWrite ? instr[11:7] : 5'b0;
 
 // Write back
 assign WriteBackData = MemToReg ? dReadData : dWriteData;
