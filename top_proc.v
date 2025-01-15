@@ -67,14 +67,14 @@ end
 
 INSTRUCTION_MEMORY instr_mem (
     .clk(clk),
-    .addr(PC),
+    .addr(PC[8:0]),
     .dout(instr)
 );
 
 DATA_MEMORY data_mem(
     .clk(clk),
     .we(MemWrite),
-    .addr(dAddress),
+    .addr(dAddress[8:0]),
     .din(dWriteData),
     .dout(WriteBackData)
 );
