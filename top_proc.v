@@ -71,6 +71,14 @@ INSTRUCTION_MEMORY instr_mem (
     .dout(instr)
 );
 
+DATA_MEMORY data_mem(
+    .clk(clk),
+    .we(MemWrite),
+    .addr(dAddress),
+    .din(dWriteData),
+    .dout(WriteBackData)
+);
+
 always @(posedge clk) begin
     // loadPC = 0;
     ALUSrc = (instr[6:0] == 7'b0000011 || instr[6:0] == 7'b0010011) ? 1 : 0;
