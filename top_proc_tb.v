@@ -48,3 +48,5 @@ module top_proc_tb;
         $finish;
     end
 endmodule
+
+// TODO: Check communications
