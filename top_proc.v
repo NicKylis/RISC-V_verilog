@@ -1,6 +1,6 @@
 `include "datapath.v"
-`include "rom.v"
-`include "ram.v"
+// `include "rom.v"
+// `include "ram.v"
 
 module top_proc #(parameter INITIAL_PC = 32'h00400000) (
     input clk,
@@ -81,10 +81,12 @@ DATA_MEMORY data_mem(
 
 always @(posedge clk) begin
     // loadPC = 0;
-    ALUSrc = (instr[6:0] == 7'b0000011 || instr[6:0] == 7'b0010011) ? 1 : 0;
-    MemRead = 0;
-    MemWrite = 0;
-    fsm_state = (rst) ? 3'b000 : fsm_state;
+    ALUSrc <= (instr[6:0] == 7'b0000011 || instr[6:0] == 7'b0010011) ? 1 : 0;
+    MemRead <= 0;
+    MemWrite <= 0;
+    if (rst) begin
+        fsm_state = 3'b000;
+    end
     case(fsm_state)
         3'b000: begin
             // IF
@@ -135,11 +137,16 @@ always @(posedge clk) begin
             // Next state: 3'b000
         end
     endcase
-    fsm_state <= (loadPC) ? 3'b000 : (fsm_state + 1);
+    // fsm_state = (loadPC) ? 3'b000 : (fsm_state + 1);
+    if(loadPC) begin
+        fsm_state <= 3'b000;
+    end else begin
+        fsm_state <= fsm_state + 3'b001;
+    end
     RegWrite <= 0;
 end
 
-datapath #(.INITIAL_PC(INITIAL_PC)) datapath (
+datapath #(.INITIAL_PC(INITIAL_PC)) top_datapath (
     .clk(clk),
     .rst(rst),
     .instr(instr),

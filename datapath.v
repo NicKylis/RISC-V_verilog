@@ -1,7 +1,7 @@
 `include "alu.v"
 `include "regfile.v"
-// `include "ram.v"
-// `include "rom.v"
+`include "ram.v"
+`include "rom.v"
 
 module datapath #(parameter INITIAL_PC = 32'h00400000) (
     input clk,
@@ -63,20 +63,6 @@ assign imm_I = {{20{instr[31]}}, instr[31:20]};
 assign imm_S = {{20{instr[31]}}, instr[31:25], instr[11:7]};
 assign imm_B = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0};
 
-// ALU control
-// always @(*) begin
-//     case(instr[6:0])
-//         7'b0110011: ALUCtrl = 4'b0010; // R-type
-//         7'b0010011: ALUCtrl = 4'b0010; // I-type
-//         7'b0000011: ALUCtrl = 4'b0000; // Load
-//         7'b1100011: ALUCtrl = 4'b0110; // Branch
-//         7'b0100011: ALUCtrl = 4'b0000; // Store
-//         7'b0010111: ALUCtrl = 4'b0010; // U-type
-//         7'b0110111: ALUCtrl = 4'b0010; // UJ-type
-//         default: ALUCtrl = 4'b0000;
-//     endcase
-// end
-
 // ALU
 alu datapath_alu (
     .op1(readData1),
@@ -86,9 +72,7 @@ alu datapath_alu (
     .zero(Zero)
 );
 
-// Next instruciton
-// wire [31:0] next_PC;
-// assign next_PC = PCSrc ? (PC + branch_offset) : (PC + 4);
+wire opcode = instr[6:0];
 
 always @(posedge clk) begin
     if (rst) begin
@@ -96,6 +80,26 @@ always @(posedge clk) begin
     end else begin
         PC <= PCSrc ? (PC + branch_offset) : (PC + 4);
     end
+        case(opcode)
+        7'b0010011: begin //I type
+
+        end
+        7'b0110011: begin //R type
+
+        end
+        7'b1100011: begin //branch
+
+        end
+        7'b0000011, 7'b0100011: begin //load and save
+
+        end
+        default: begin
+
+        end
+        endcase
+
 end
+
+
 
 endmodule
