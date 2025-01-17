@@ -65,12 +65,6 @@ always @(*) begin
         endcase
 end
 
-INSTRUCTION_MEMORY instr_mem (
-    .clk(clk),
-    .addr(PC[8:0]),
-    .dout(instr)
-);
-
 DATA_MEMORY data_mem(
     .clk(clk),
     .we(MemWrite),
@@ -91,6 +85,7 @@ always @(posedge clk) begin
         3'b000: begin
             // IF
             PCSrc = (ALUCtrl == 4'b0110 && Zero) ? 1 : 0;
+            loadPC = 0;
             // MemRead = 1
             // MemWrite = 0
             // WriteBackData = 0
@@ -128,8 +123,8 @@ always @(posedge clk) begin
         end
         3'b100: begin
             // WB
-            loadPC = 1;
-            RegWrite = 1;
+            loadPC <= 1;
+            RegWrite <= 1;
             // PCSrc = ;
             // MemRead = 0
             // MemWrite = 0
@@ -161,5 +156,12 @@ datapath #(.INITIAL_PC(INITIAL_PC)) top_datapath (
     .RegWrite(RegWrite),
     .PCSrc(PCSrc)
 );
+
+INSTRUCTION_MEMORY instr_mem (
+    .clk(clk),
+    .addr(PC[8:0]),
+    .dout(instr)
+);
+
 
 endmodule
