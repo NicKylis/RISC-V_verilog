@@ -43,7 +43,7 @@ module top_proc_tb;
         // Reset the DUT
         RESET();
         // Wait for 100ns before starting the test
-        #100;
+        #300;
        
         $finish;
     end
