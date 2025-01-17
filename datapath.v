@@ -79,7 +79,8 @@ always @(posedge clk) begin
         PC <= INITIAL_PC;
     end else begin
         if (loadPC) begin
-            PC <= PCSrc ? (PC + branch_offset) : (PC + 4);
+            // PC <= PCSrc ? (PC + branch_offset) : (PC + 4);
+            PC <= PC + 4;
         end
     end
         case(opcode)

@@ -73,13 +73,13 @@ DATA_MEMORY data_mem(
     .dout(WriteBackData)
 );
 
-always @(posedge clk) begin
+always @(posedge clk, rst) begin
     // loadPC = 0;
     ALUSrc <= (instr[6:0] == 7'b0000011 || instr[6:0] == 7'b0010011) ? 1 : 0;
     MemRead <= 0;
     MemWrite <= 0;
     if (rst) begin
-        fsm_state = 3'b000;
+        fsm_state = 3'b100;
     end
     case(fsm_state)
         3'b000: begin
@@ -123,8 +123,8 @@ always @(posedge clk) begin
         end
         3'b100: begin
             // WB
-            loadPC <= 1;
-            RegWrite <= 1;
+            loadPC = 1;
+            RegWrite = 1;
             // PCSrc = ;
             // MemRead = 0
             // MemWrite = 0
