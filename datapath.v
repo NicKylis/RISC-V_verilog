@@ -21,11 +21,20 @@ module datapath #(parameter INITIAL_PC = 32'h00400000) (
     output [31:0] WriteBackData
 );
 
+// Immediate generation
+wire [31:0] imm_I;
+wire [31:0] imm_S;
+wire [31:0] imm_B;
+
+assign imm_I = {{20{instr[31]}}, instr[31:20]};
+assign imm_S = {{20{instr[31]}}, instr[31:25], instr[11:7]};
+assign imm_B = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0};
+
 // Program Counter and Branch Target
 
 // Branch instruction
 wire [31:0] branch_offset;
-assign branch_offset = {{14{instr[15]}}, instr[15:0]} << 2;
+assign branch_offset = {{14{imm_B[15]}}, imm_B[15:0]} << 2;
 
 // Register File
 // Decoded register addresses
@@ -53,15 +62,6 @@ regfile #(.DATAWIDTH(32), .REGCOUNT(32)) regfile (
     .readData1(readData1),
     .readData2(readData2)
 );
-
-// Immediate generation
-wire [31:0] imm_I;
-wire [31:0] imm_S;
-wire [31:0] imm_B;
-
-assign imm_I = {{20{instr[31]}}, instr[31:20]};
-assign imm_S = {{20{instr[31]}}, instr[31:25], instr[11:7]};
-assign imm_B = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0};
 
 // ALU
 alu datapath_alu (
@@ -101,7 +101,6 @@ always @(posedge clk) begin
         endcase
 
 end
-
 
 
 endmodule
