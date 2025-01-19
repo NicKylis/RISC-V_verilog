@@ -1,7 +1,5 @@
 `include "alu.v"
 `include "regfile.v"
-`include "ram.v"
-`include "rom.v"
 
 module datapath #(parameter INITIAL_PC = 32'h00400000) (
     input clk,
@@ -60,9 +58,6 @@ regfile #(.DATAWIDTH(32), .REGCOUNT(32)) regfile (
     .readData2(readData2)
 );
 
-// Write back
-// assign WriteBackData = MemToReg ? dReadData : dWriteData;
-
 // ALU
 alu datapath_alu (
     .op1(readData1),
@@ -92,24 +87,6 @@ always @(posedge clk) begin
         end
     end
     end
-        // case(opcode)
-        // 7'b0010011: begin //I type
-
-        // end
-        // 7'b0110011: begin //R type
-
-        // end
-        // 7'b1100011: begin //branch
-
-        // end
-        // 7'b0000011, 7'b0100011: begin //load and save
-
-        // end
-        // default: begin
-
-        // end
-        // endcase
-
 end
 
 
