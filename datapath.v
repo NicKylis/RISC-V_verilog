@@ -78,11 +78,11 @@ always @(posedge clk) begin
             end else begin
                 PC <= PC + 4;
             end
+        end
         if (MemToReg) begin
             WriteBackData <= dReadData;
         end else begin
             WriteBackData <= dWriteData;
-        end
     end
     end
 end
