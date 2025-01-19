@@ -30,47 +30,12 @@ initial begin
     fsm_state = 3'b000;
 end
 
-// ALUCtrl unit
-always @(*) begin
-        case (instr[6:0])
-            // Memory instructions
-            7'b0000011, // LW
-            7'b0100011: // SW
-                ALUCtrl = 4'b0010; // Addition for address calculation
-            // Branch instruction
-            7'b1100011:
-                ALUCtrl = 4'b0110; // Subtraction for comparison
-            // R instructions
-            7'b0110011:
-                case (instr[14:12])
-                    3'b000: // ADD/SUB
-                        ALUCtrl = (instr[31:25] == 7'b0100000) ? 4'b0110 : 4'b0010; // SUB if funct7=0100000, else ADD
-                    3'b111: // AND
-                        ALUCtrl = 4'b0000;
-                    3'b110: // OR
-                        ALUCtrl = 4'b0001;
-                    3'b100: // XOR
-                        ALUCtrl = 4'b0101;
-                    3'b001: // SLL
-                        ALUCtrl = 4'b1001;
-                    3'b101: // SRL/SRA
-                        ALUCtrl = (instr == 7'b0100000) ? 4'b1010 : 4'b1000; // SRA if funct7=0100000, else SRL
-                    3'b010: // SLT
-                        ALUCtrl = 4'b0100;
-                    default:
-                        ALUCtrl = 4'b1111; // Default error code
-                endcase
-            default: // Undefined opcode
-                ALUCtrl = 4'b1111; // Default error code
-        endcase
-end
-
 DATA_MEMORY data_mem(
     .clk(clk),
     .we(MemWrite),
     .addr(PC[8:0]),
     .din(dWriteData),
-    .dout(WriteBackData)
+    .dout(dReadData)
 );
 
 always @(posedge clk, rst) begin
@@ -78,6 +43,7 @@ always @(posedge clk, rst) begin
     ALUSrc <= (instr[6:0] == 7'b0000011 || instr[6:0] == 7'b0010011) ? 1 : 0;
     MemRead <= 0;
     MemWrite <= 0;
+    MemToReg <= 0;
     PCSrc <= 0;
     if (rst) begin
         fsm_state = 3'b100;
@@ -87,25 +53,14 @@ always @(posedge clk, rst) begin
             // IF
             PCSrc = (ALUCtrl == 4'b0110 && Zero) ? 1 : 0;
             loadPC = 0;
-            // MemRead = 1
-            // MemWrite = 0
-            // WriteBackData = 0
             // Next state: 3'b001
         end
         3'b001: begin
             // ID
-            // dAddress = 0
-            // MemRead = 0
-            // MemWrite = 0
-            // WriteBackData = 0
             // Next state: 3'b010
         end
         3'b010: begin
             // EX
-            // dAddress = 0
-            // MemRead = 0
-            // MemWrite = 0
-            // WriteBackData = 0
             // Next state: 3'b011
         end
         3'b011: begin
@@ -119,17 +74,12 @@ always @(posedge clk, rst) begin
                 MemWrite = 1;
                 MemToReg = 0;
             end
-            // WriteBackData = 0
             // Next state: 3'b100
         end
         3'b100: begin
             // WB
             loadPC = 1;
             RegWrite = 1;
-            // PCSrc = ;
-            // MemRead = 0
-            // MemWrite = 0
-            // WriteBackData = 0
             // Next state: 3'b000
         end
     endcase
@@ -164,5 +114,36 @@ INSTRUCTION_MEMORY instr_mem (
     .dout(instr)
 );
 
+always @(posedge clk) begin
+        case (instr[6:0])
+            // Memory instructions
+            7'b0000011, // LW
+            7'b0100011: // SW
+                ALUCtrl = 4'b0010; // Addition for address calculation
+            // Branch instruction
+            7'b1100011:
+                ALUCtrl = 4'b0110; // Subtraction for comparison
+            // R and I instructions
+            default:
+                case (instr[14:12])
+                    3'b000: // ADD/SUB
+                        ALUCtrl = (instr[31:25] == 7'b0100000) ? 4'b0110 : 4'b0010; // SUB if funct7=0100000, else ADD
+                    3'b111: // AND
+                        ALUCtrl = 4'b0000;
+                    3'b110: // OR
+                        ALUCtrl = 4'b0001;
+                    3'b100: // XOR
+                        ALUCtrl = 4'b0101;
+                    3'b001: // SLL
+                        ALUCtrl = 4'b1001;
+                    3'b101: // SRL/SRA
+                        ALUCtrl = (instr == 7'b0100000) ? 4'b1010 : 4'b1000; // SRA if funct7=0100000, else SRL
+                    3'b010: // SLT
+                        ALUCtrl = 4'b0100;
+                    default:
+                        ALUCtrl = 4'b1111; // Default error code
+                endcase
+        endcase
+end
 
 endmodule

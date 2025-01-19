@@ -18,7 +18,7 @@ module datapath #(parameter INITIAL_PC = 32'h00400000) (
     output [31:0] dAddress,
     output [31:0] dWriteData,
     input [31:0] dReadData,
-    output [31:0] WriteBackData
+    output reg [31:0] WriteBackData
 );
 
 // Immediate generation
@@ -49,9 +49,6 @@ assign readReg2 = instr[24:20];
 
 assign writeReg = RegWrite ? instr[11:7] : 5'b0;
 
-// Write back
-assign WriteBackData = MemToReg ? dReadData : dWriteData;
-
 regfile #(.DATAWIDTH(32), .REGCOUNT(32)) regfile (
     .clk(clk),
     .readReg1(readReg1),
@@ -62,6 +59,9 @@ regfile #(.DATAWIDTH(32), .REGCOUNT(32)) regfile (
     .readData1(readData1),
     .readData2(readData2)
 );
+
+// Write back
+// assign WriteBackData = MemToReg ? dReadData : dWriteData;
 
 // ALU
 alu datapath_alu (
@@ -77,6 +77,7 @@ wire opcode = instr[6:0];
 always @(posedge clk) begin
     if (rst) begin
         PC <= INITIAL_PC;
+        WriteBackData <= 32'b0;
     end else begin
         if (loadPC) begin
             if(PCSrc) begin
@@ -84,27 +85,30 @@ always @(posedge clk) begin
             end else begin
                 PC <= PC + 4;
             end
-            PC <= PCSrc ? (PC + branch_offset) : (PC + 4);
-            // PC <= PC + 4;
+        if (MemToReg) begin
+            WriteBackData <= dReadData;
+        end else begin
+            WriteBackData <= dWriteData;
         end
     end
-        case(opcode)
-        7'b0010011: begin //I type
+    end
+        // case(opcode)
+        // 7'b0010011: begin //I type
 
-        end
-        7'b0110011: begin //R type
+        // end
+        // 7'b0110011: begin //R type
 
-        end
-        7'b1100011: begin //branch
+        // end
+        // 7'b1100011: begin //branch
 
-        end
-        7'b0000011, 7'b0100011: begin //load and save
+        // end
+        // 7'b0000011, 7'b0100011: begin //load and save
 
-        end
-        default: begin
+        // end
+        // default: begin
 
-        end
-        endcase
+        // end
+        // endcase
 
 end
 
