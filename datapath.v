@@ -67,8 +67,6 @@ alu datapath_alu (
     .zero(Zero)
 );
 
-wire opcode = instr[6:0];
-
 always @(posedge clk) begin
     if (rst) begin
         PC <= INITIAL_PC;
